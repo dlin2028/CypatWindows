@@ -1,0 +1,17 @@
+HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer NoWindowsUpdate REG_DWORD 0
+HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\WindowsUpdate DisableWindowsUpdateAccess REG_DWORD 0
+HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\LSASS.exe AuditLevel REG_DWORD 00000008
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update AUOptions REG_DWORD 3
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update AUOptions REG_DWORD 3
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update AUOptions REG_DWORD 4
+HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate DisableWindowsUpdateAccess REG_DWORD 0
+HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate ElevateNonAdmins REG_DWORD 0
+HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU AUOptions REG_DWORD 4
+HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU AutoInstallMinorUpdates REG_DWORD 1
+HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU NoAutoUpdate REG_DWORD 0
+HKLM\SYSTEM\CurrentControlSet\Control\Lsa RunAsPPL REG_DWORD 00000001
+HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server fDenyTSConnections REG_DWORD 1
+HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server fDenyTSConnections REG_DWORD 1
+HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp UserAuthentication REG_DWORD 0
+HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp UserAuthentication REG_DWORD 0
+HKLM\SYSTEM\Internet Communication Management\Internet Communication DisableWindowsUpdateAccess REG_DWORD 0

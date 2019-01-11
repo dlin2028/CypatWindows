@@ -1,0 +1,11 @@
+C:\Users\David\Documents\GitHub\CypatWindows\CypatWindows\bin\Release\Interop.NetFwTypeLib.dll
+C:\Users\David\Documents\GitHub\CypatWindows\CypatWindows\bin\Release\CypatWindows.exe.config
+C:\Users\David\Documents\GitHub\CypatWindows\CypatWindows\bin\Release\CypatWindows.exe
+C:\Users\David\Documents\GitHub\CypatWindows\CypatWindows\bin\Release\CypatWindows.pdb
+C:\Users\David\Documents\GitHub\CypatWindows\CypatWindows\bin\Release\WindowsFirewallHelper.dll
+C:\Users\David\Documents\GitHub\CypatWindows\CypatWindows\bin\Release\WindowsFirewallHelper.xml
+C:\Users\David\Documents\GitHub\CypatWindows\CypatWindows\obj\Release\CypatWindows.csprojAssemblyReference.cache
+C:\Users\David\Documents\GitHub\CypatWindows\CypatWindows\obj\Release\CypatWindows.csproj.CoreCompileInputs.cache
+C:\Users\David\Documents\GitHub\CypatWindows\CypatWindows\obj\Release\CypatWindows.csproj.CopyComplete
+C:\Users\David\Documents\GitHub\CypatWindows\CypatWindows\obj\Release\CypatWindows.exe
+C:\Users\David\Documents\GitHub\CypatWindows\CypatWindows\obj\Release\CypatWindows.pdb

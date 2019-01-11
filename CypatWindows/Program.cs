@@ -11,6 +11,8 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Diagnostics;
+using System.Security.AccessControl;
+using System.DirectoryServices;
 
 namespace CypatWindows
 {
@@ -50,12 +52,126 @@ namespace CypatWindows
                 foreach (var line in lines)
                 {
                     Console.WriteLine("Disabling " + line);
-                    ExecuteCommand("dism /online /disable-feature /featurename:" + line);
+                    //ExecuteCommand("dism /online /disable-feature /featurename:" + line);
                 }
             }
             #endregion
 
+            Console.WriteLine("flushing dns");
+            ExecuteCommand("ipconfig /flushdns");
+
+            Console.WriteLine("setting password age");
+            ExecuteCommand("net accounts /minpwlen:10");
+            ExecuteCommand("net accounts /minpwage:5");
+            ExecuteCommand("net accounts /maxpwage:30");
+
+            Console.WriteLine(@"Deleting media files in C:\Users");
+            Console.WriteLine("OWNING COMPUTER");
+            ExecuteCommand("icacls " + @"C:\Users" + " /setowner \"Administrators\" /T /C");
+            
+            #region users
+            {
+                string[] admins = File.ReadAllLines(@"admins.txt");
+                string[] standards = File.ReadAllLines(@"standards.txt");
+                string[] combined = admins.Concat(standards).ToArray();
+
+                DirectoryEntry localDirectory = new DirectoryEntry("WinNT://" + Environment.MachineName.ToString());
+                DirectoryEntries users = localDirectory.Children;
+
+
+                List<string> unauthorizedUsers = GetComputerUsers();
+                foreach (var userName in combined)
+                {
+                    Console.WriteLine($"Found authorized user {userName}");
+                    unauthorizedUsers.Remove(userName);
+                }
+
+                foreach (var unauthorizedUser in unauthorizedUsers)
+                {
+                    try
+                    {
+                        Console.WriteLine($"Press enter to remove unauthorized user {unauthorizedUser}");
+                        Console.ReadKey();
+                        DirectoryEntry user = users.Find(unauthorizedUser);
+                        users.Remove(user);
+                        Console.WriteLine($"Removed unauthorized user {unauthorizedUser}");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"failed to remove unauthorized user {unauthorizedUser}");
+                        Console.WriteLine(e.ToString());
+                    }
+                }
+
+                foreach (var userName in admins)
+                {
+                    try
+                    {
+                        DirectoryEntry user = users.Find(userName);
+                        Console.WriteLine($"Found admin {userName}");
+                    }
+                    catch
+                    {
+                        DirectoryEntry AD = new DirectoryEntry("WinNT://" +
+                                       Environment.MachineName + ",computer");
+                        DirectoryEntry NewUser = AD.Children.Add(userName, "user");
+                        NewUser.Invoke("SetPassword", new object[] { "Exploratory123$" });
+                        NewUser.Invoke("Put", new object[] { "Description", "admin user added by script" });
+                        NewUser.CommitChanges();
+                        DirectoryEntry grp;
+
+                        grp = AD.Children.Find("Administrators", "group");
+                        if (grp != null) { grp.Invoke("Add", new object[] { NewUser.Path.ToString() }); }
+                        Console.WriteLine($"Admin account {userName} Created Successfully");
+                        Console.WriteLine($"Password: Exploratory123$");
+                    }
+                }
+
+
+                foreach (var userName in standards)
+                {
+                    try
+                    {
+                        DirectoryEntry user = users.Find(userName);
+                        Console.WriteLine($"Found standard user {userName}");
+                    }
+                    catch
+                    {
+                        DirectoryEntry AD = new DirectoryEntry("WinNT://" +
+                                       Environment.MachineName + ",computer");
+                        DirectoryEntry NewUser = AD.Children.Add(userName, "user");
+                        NewUser.Invoke("SetPassword", new object[] { "Exploratory123$" });
+                        NewUser.Invoke("Put", new object[] { "Description", "standard user added by script" });
+                        NewUser.CommitChanges();
+                        DirectoryEntry grp;
+
+                        grp = AD.Children.Find("Users", "group");
+                        if (grp != null) { grp.Invoke("Add", new object[] { NewUser.Path.ToString() }); }
+                        Console.WriteLine($"Standard account {userName} Created Successfully");
+                        Console.WriteLine($"Password: Exploratory123$");
+                    }
+                }
+
+            }
+            #endregion
+
+
+
             Console.ReadKey();
+        }
+
+        public static List<string> GetComputerUsers()
+        {
+            List<string> users = new List<string>();
+            var path =
+                string.Format("WinNT://{0},computer", Environment.MachineName);
+
+            using (var computerEntry = new DirectoryEntry(path))
+                foreach (DirectoryEntry childEntry in computerEntry.Children)
+                    if (childEntry.SchemaClassName == "User")
+                        users.Add(childEntry.Name);
+
+            return users;
         }
 
         static void SetFirewallRule(string name, bool enabled)
@@ -104,11 +220,8 @@ namespace CypatWindows
         {
             //WinAPIForGroupPolicy.
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="command"></param>
-        static void ExecuteCommand(string command)
+
+        static void ExecuteCommand(string command, bool block = false)
         {
             int exitCode;
             ProcessStartInfo processInfo;
@@ -117,8 +230,29 @@ namespace CypatWindows
             processInfo = new ProcessStartInfo("cmd.exe", "/c " + command);
             
             process = Process.Start(processInfo);
+            while(!process.HasExited && block)
+            {
 
+            }
             process.Close();
+        }
+
+        private static void AddFiles(string path, IList<string> files)
+        {
+            try
+            {
+                Directory.GetFiles(path)
+                    .ToList()
+                    .ForEach(s => files.Add(s));
+
+                Directory.GetDirectories(path)
+                    .ToList()
+                    .ForEach(s => AddFiles(s, files));
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                // ok, so we are not allowed to dig into that directory. Move on.
+            }
         }
     }
 }
